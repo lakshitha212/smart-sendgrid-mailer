@@ -6,6 +6,7 @@ Description: Smart Sendgrid Mailer plugin is a wordpress plugin
 Version: 1.0
 Author: Lakshitha212
 Author URI: https://github.com/lakshitha212
+Domain Path: /languages
 */
 define('SSM_DIR', dirname(__FILE__));
 define('SSM_THEMES_DIR', SSM_DIR . "/themes");
@@ -31,5 +32,38 @@ function ssm_install()
 }
 register_activation_hook(__FILE__, 'ssm_install');
 
-// register_deactivation_hook(( string $file, callable $callback );
-// register_uninstall_hook( string $file, callable $callback );
+// register_deactivation_hook( __FILE__, 'pluginprefix_function_to_run' );
+// register_uninstall_hook(__FILE__, 'pluginprefix_function_to_run');
+
+add_action('admin_menu', 'ssm_create_menu');
+
+function ssm_create_menu() {
+	add_menu_page('SSM Plugin Settings', 'SSM Settings', 'administrator', __FILE__, 'ssm_settings_page');
+	add_action( 'admin_init', 'register_ssm_settings' );
+}
+
+
+function register_ssm_settings() {
+	register_setting( 'ssm-settings-group', 'ssm_api_key' );
+}
+
+function ssm_settings_page() {
+?>
+<div class="wrap">
+<h1>Smart Sendgrid Mailer</h1>
+
+<form method="post" action="options.php">
+    <?php settings_fields( 'ssmn-settings-group' ); ?>
+    <?php do_settings_sections( 'ssm-settings-group' ); ?>
+    <table class="form-table">
+        <tr valign="top">
+        <th scope="row">Sendgrid API Key</th>
+        <td><input type="text" name="ssm_api_key" value="<?php echo esc_attr( get_option('ssm_api_key') ); ?>" /></td>
+        </tr>
+    </table>
+    
+    <?php submit_button(); ?>
+
+</form>
+</div>
+<?php } ?>
